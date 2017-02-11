@@ -4,7 +4,7 @@ import java.util.HashSet;
 public class ExtendedHashSet<T> extends HashSet<T>
 {
 	private static final long serialVersionUID = 1L;
-	public static int modulus = 30;
+	public static int modulus = 20;
 	private long product = 1;
 	
 	public ExtendedHashSet()
@@ -30,19 +30,23 @@ public class ExtendedHashSet<T> extends HashSet<T>
 	
 	public boolean add(T element)
 	{
-		int x = (element.hashCode() % modulus + modulus) % modulus + 1;		
-		if(product > 0)
+		if(super.add(element) == true)
 		{
-			if(this.product <= Long.MAX_VALUE / x)
-			{
-				this.product *= x;
+			int x = (element.hashCode() % modulus + modulus) % modulus + 1;
+			if(product > 0)
+			{			
+				if(this.product <= Long.MAX_VALUE / x)
+				{
+					this.product *= x;
+				}
+				else
+				{
+					this.product = 0;
+				}
 			}
-			else
-			{
-				this.product = 0;
-			}
-		}				
-		return super.add(element);
+			return true;
+		}
+		return false;
 	}
 	
 	public void clear()
@@ -63,16 +67,16 @@ public class ExtendedHashSet<T> extends HashSet<T>
 	
 	public boolean remove(Object obj)
 	{
-		boolean removed = super.remove(obj);
-		if(removed == true)
+		if(super.remove(obj) == true)
 		{
 			int x = (obj.hashCode() % modulus + modulus) % modulus + 1;
 			if(this.product > 0)
 			{
 				this.product /= x;
 			}
+			return true;
 		}		
-		return removed;
+		return false;
 	}
 	
 	public boolean removeAll(Collection<?> collection)
@@ -123,7 +127,7 @@ public class ExtendedHashSet<T> extends HashSet<T>
 		{
 			return false;
 		}
-		if(this.product <= 0 || set.product <= 0 || set.product % this.product == 0)
+		if(set.product <= 0 || (this.product > 0 && set.product % this.product == 0))
 		{
 			return set.containsAll(this);
 		}		
