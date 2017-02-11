@@ -7,7 +7,7 @@ public class Main
 	public static void main(String[] args) 
 	{
 		final int listSize = 20000;
-		final int maxSetSize =30;
+		final int maxSetSize = 20;
 		final int maxSetValue = 100;
 		
 		//Generate list of HashSets
