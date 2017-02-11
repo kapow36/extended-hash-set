@@ -6,8 +6,8 @@ public class Main
 {
 	public static void main(String[] args) 
 	{
-		final int listSize = 30000;
-		final int maxSetSize = 20;
+		final int listSize = 20000;
+		final int maxSetSize =30;
 		final int maxSetValue = 100;
 		
 		//Generate list of HashSets
@@ -22,7 +22,7 @@ public class Main
 				set.add(rand.nextInt(maxSetValue));
 			}			
 			list.add(set);
-		}		
+		}
 		
 		//run sample for ExtendedHashSet
 		long start = System.currentTimeMillis();
@@ -32,12 +32,12 @@ public class Main
 			for(ExtendedHashSet<Integer> setB : list)
 			{
 				if(setB.isSubsetOf(setA))
-				{
+				{					
 					subsetCount++;
 				}
 			}
-		}		
-		System.out.println("Subset search completed in " + (System.currentTimeMillis() - start) + " milliseconds with " + subsetCount + " Subsets Found\n");
+		}
+		System.out.println("ExtendedHashSet:\nSubset search completed in " + (System.currentTimeMillis() - start) + " milliseconds with " + subsetCount + " Subsets Found\n");
 		
 		//run sample for Normal HashSet
 		start = System.currentTimeMillis();
@@ -55,7 +55,7 @@ public class Main
 				}
 			}
 		}		
-		System.out.println("Subset search completed in " + (System.currentTimeMillis() - start) + " milliseconds with " + subsetCount + " Subsets Found\n");
+		System.out.println("HasheSet:\nSubset search completed in " + (System.currentTimeMillis() - start) + " milliseconds with " + subsetCount + " Subsets Found\n");
 	} 
 	
 	public static String generateString(Random rng, String characters, int length)
