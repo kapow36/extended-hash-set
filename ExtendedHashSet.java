@@ -2,10 +2,11 @@ import java.util.Collection;
 import java.util.HashSet;
 
 public class ExtendedHashSet<T> extends HashSet<T>
-{
+{	
 	private static final long serialVersionUID = 1L;
-	public static int modulus = 20;
-	private long product = 1;
+	private long productA = 1;
+	private long productB = 1;
+	private long productC = 1;
 	
 	public ExtendedHashSet()
 	{
@@ -31,17 +32,24 @@ public class ExtendedHashSet<T> extends HashSet<T>
 	public boolean add(T element)
 	{
 		if(super.add(element) == true)
-		{
-			int x = (element.hashCode() % modulus + modulus) % modulus + 1;
-			if(product > 0)
-			{			
-				if(this.product <= Long.MAX_VALUE / x)
+		{			
+			if(this.productA > 0)
+			{
+				int hashCode = element.hashCode();
+				int a = (hashCode & 7) + 1;
+				int b = ((hashCode >> 3) & 7) + 1;
+				int c = ((hashCode >> 6) & 7) + 1;
+					
+				this.productA *= a;
+				this.productB *= b;
+				this.productC *= c;
+				
+				//check if overflow happened
+				if(this.productA < 0 || this.productB < 0 || this.productC < 0)
 				{
-					this.product *= x;
-				}
-				else
-				{
-					this.product = 0;
+					this.productA = 0;
+					this.productB = 0;
+					this.productC = 0;
 				}
 			}
 			return true;
@@ -51,7 +59,8 @@ public class ExtendedHashSet<T> extends HashSet<T>
 	
 	public void clear()
 	{
-		this.product = 1;
+		this.productA = 1;
+		this.productB = 1;
 		super.clear();
 	}
 	
@@ -68,11 +77,17 @@ public class ExtendedHashSet<T> extends HashSet<T>
 	public boolean remove(Object obj)
 	{
 		if(super.remove(obj) == true)
-		{
-			int x = (obj.hashCode() % modulus + modulus) % modulus + 1;
-			if(this.product > 0)
+		{		
+			if(this.productA > 0)
 			{
-				this.product /= x;
+				int hashCode = obj.hashCode();
+				int a = (hashCode & 7) + 1;					
+				int b = ((hashCode >> 3) & 7) + 1;
+				int c = ((hashCode >> 6) & 7) + 1;
+				
+				this.productA /= a;
+				this.productB /= b;
+				this.productC /= c;
 			}
 			return true;
 		}		
@@ -98,7 +113,7 @@ public class ExtendedHashSet<T> extends HashSet<T>
 		if(obj instanceof ExtendedHashSet<?> == true)
 		{
 			ExtendedHashSet<?> set = (ExtendedHashSet<?>)obj;
-			if(this.product == set.product)
+			if(this.productA == set.productA && this.productB == set.productB && this.productC == set.productC)
 			{
 				return super.equals(obj);
 			}
@@ -121,16 +136,22 @@ public class ExtendedHashSet<T> extends HashSet<T>
 		return super.retainAll(collection);
 	}
 	
+	//check if "this" is a subset of "set"
 	public boolean isSubsetOf(ExtendedHashSet<T> set)
-	{
-		if(this.size() > set.size())
+	{		
+		//if "this" has a greater size than "set" or "this" overflows and "set" does not, can't be a subset
+		if(this.size() > set.size() || (this.productA == 0 && set.productA != 0))
 		{
 			return false;
 		}
-		if(set.product <= 0 || (this.product > 0 && set.product % this.product == 0))
+		
+		//if "set" overflows, have to do a full check
+		//check if "this" products divide "set" products, if they do, we need to do a full check
+		if(set.productA == 0 || (set.productA % this.productA == 0 && set.productB % this.productB == 0 && set.productC % this.productC == 0))
 		{
 			return set.containsAll(this);
-		}		
+		}
+		
 		return false;
 	}
 	
